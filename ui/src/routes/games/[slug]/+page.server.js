@@ -1,5 +1,5 @@
-import { getGame } from '$lib/server/db';
-import { saveVote } from '../../../lib/server/db';
+import { redirect } from '@sveltejs/kit';
+import { getGame, saveVote, createUser, getUser } from '$lib/server/db';
 
 const voteOptions = [
 	{
@@ -23,27 +23,43 @@ export function load(evt) {
 	game.voteOptions = voteOptions;
 	console.log(game);
 
-	const user = {
-		id: 1
-	};
+	const user = getUser(evt.cookies.get('auth'));
 
-	const currentIdx = game.items.findIndex(
-		(item) => !item.votes || !item.votes.find((vote) => vote.userId === user.id)
-	);
-	const currentItem = game.items[currentIdx];
-
+	let currentItem = null;
+	if (user) {
+		const currentIdx = game.items.findIndex(
+			(item) => !item.votes || !item.votes.find((vote) => vote.userId === user.id)
+		);
+		currentItem = game.items[currentIdx];
+	}
 	console.log('server data', { game, items: game.items, user, currentItem });
 	return { game, user, currentItem };
 }
 
 /** @type {import('./$types').Actions} */
 export const actions = {
-	vote: async (evt) => {
+	register: async (evt) => {
 		const data = await evt.request.formData();
-		const itemId = data.get('item');
-		const vote = data.get('vote');
+		const name = data.get('name');
+		console.log(data, name);
+		const user = createUser(name);
+		console.log(user);
+		evt.cookies.set('auth', user.hash, {
+			path: '/',
+			sameSite: 'strict',
+			maxAge: 60 * 60 * 24 * 360 * 10
+		});
+		throw redirect(303, evt.url.pathname);
+	},
+	vote: async (evt) => {
+		const user = getUser(evt.cookies.get('auth'));
+		if (user) {
+			const data = await evt.request.formData();
+			const itemId = data.get('item');
+			const vote = data.get('vote');
 
-		console.log('vote', { itemId, vote });
-		saveVote(itemId, 1, vote);
+			console.log('vote', { itemId, vote });
+			saveVote(itemId, user.id, vote);
+		}
 	}
 };

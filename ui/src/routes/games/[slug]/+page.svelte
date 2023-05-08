@@ -10,27 +10,37 @@
 
 <h1>{game.name}</h1>
 
-<section class="vote">
-	<div>
-		<h2>{currentItem.name}</h2>
-		<h3>{currentItem.description}</h3>
-		<form method="POST" action="?/vote">
-			<fieldset>
-				{#each game.voteOptions as value, valueIdx}
-					<label for="v-{valueIdx}">{value.label}</label>
-					<input
-						type="radio"
-						name="vote"
-						id="v-{valueIdx}"
-						value={value.value}
-						bind:group={currentVote}
-					/>
-				{/each}
-			</fieldset>
-			<button type="submit" name="item" value={currentItem.id} disabled={currentVote === null}
-				>Next</button
-			>
-			<!--button type="button" on:click={saveVote} disabled={currentVote === null}>Next</button-->
+{#if data.user.id}
+	<section class="vote">
+		<div>
+			<h2>{currentItem.name}</h2>
+			<h3>{currentItem.description}</h3>
+			<form method="POST" action="?/vote">
+				<fieldset>
+					{#each game.voteOptions as value, valueIdx}
+						<label for="v-{valueIdx}">{value.label}</label>
+						<input
+							type="radio"
+							name="vote"
+							id="v-{valueIdx}"
+							value={value.value}
+							bind:group={currentVote}
+						/>
+					{/each}
+				</fieldset>
+				<button type="submit" name="item" value={currentItem.id} disabled={currentVote === null}
+					>Next</button
+				>
+				<!--button type="button" on:click={saveVote} disabled={currentVote === null}>Next</button-->
+			</form>
+		</div>
+	</section>
+{:else}
+	<section class="register">
+		<form method="POST" action="?/register">
+			<label for="name">Who are you?</label>
+			<input type="text" name="name" id="name" />
+			<button type="submit">Go</button>
 		</form>
-	</div>
-</section>
+	</section>
+{/if}

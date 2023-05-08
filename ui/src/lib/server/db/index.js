@@ -1,3 +1,4 @@
+import { createHash, randomBytes } from 'node:crypto';
 import Database from 'better-sqlite3';
 import { DB_PATH } from '$env/static/private';
 
@@ -35,4 +36,24 @@ export function saveVote(gameItemId, userId, vote) {
 	db.prepare(
 		'INSERT INTO game_item_votes (game_item_id, user_id, game_item_vote) VALUES (?, ?, ?)'
 	).run(gameItemId, userId, vote);
+}
+
+export function createUser(userName) {
+	const userHash = createHash('sha256').update(randomBytes(1024)).update(userName).digest('hex');
+	const user = db
+		.prepare(
+			'INSERT INTO users (user_id, user_name, user_hash) VALUES ((SELECT COALESCE(MAX(user_id), 0) + 1 FROM users), ?, ?) RETURNING user_id AS id, user_name AS name, user_hash AS hash'
+		)
+		.get(userName, userHash);
+	return user;
+}
+
+export function getUser(hash) {
+	if (!hash) {
+		return null;
+	}
+	const user = db
+		.prepare('SELECT user_id AS id, user_name AS name FROM users WHERE user_hash = ?')
+		.get(hash);
+	return user;
 }
