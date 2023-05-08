@@ -60,6 +60,7 @@ export const actions = {
 
 			console.log('vote', { itemId, vote });
 			saveVote(itemId, user.id, vote);
+			throw redirect(303, evt.url.pathname);
 		}
 	}
 };
