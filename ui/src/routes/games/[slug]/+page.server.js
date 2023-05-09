@@ -1,39 +1,13 @@
 import { redirect } from '@sveltejs/kit';
-import { getGame, saveVote, createUser, getUser } from '$lib/server/db';
-
-const voteOptions = [
-	{
-		label: 'Hate It!',
-		value: 0
-	},
-	{
-		label: 'meh...',
-		value: 2
-	},
-	{
-		label: 'Love It!',
-		value: 5
-	}
-];
+import { saveVote, createUser, getUser } from '$lib/server/db';
+import { getGameData } from './+server';
 
 /** @type {import('./$types').PageServerLoad} */
 export function load(evt) {
 	const params = evt.params;
-	const game = getGame(params.slug);
-	game.voteOptions = voteOptions;
-	console.log(game);
-
+	const currentIdx = evt.url.searchParams.get('item');
 	const user = getUser(evt.cookies.get('auth'));
-
-	let currentItem = null;
-	if (user) {
-		const currentIdx = game.items.findIndex(
-			(item) => !item.votes || !item.votes.find((vote) => vote.userId === user.id)
-		);
-		currentItem = game.items[currentIdx];
-	}
-	console.log('server data', { game, items: game.items, user, currentItem });
-	return { game, user, currentItem };
+	return getGameData(user, params.slug, currentIdx);
 }
 
 /** @type {import('./$types').Actions} */

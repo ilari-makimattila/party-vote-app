@@ -12,6 +12,7 @@ export function getGame(gameId) {
 		)
 		.all(gameId);
 	return {
+		id: gameId,
 		name: game.game_name,
 		items: Object.values(
 			items.reduce((acc, item) => {
@@ -33,9 +34,18 @@ export function getGame(gameId) {
 }
 
 export function saveVote(gameItemId, userId, vote) {
-	db.prepare(
-		'INSERT INTO game_item_votes (game_item_id, user_id, game_item_vote) VALUES (?, ?, ?)'
-	).run(gameItemId, userId, vote);
+	const count = db
+		.prepare('SELECT count(*) AS count FROM game_item_votes WHERE game_item_id = ? AND user_id = ?')
+		.get(gameItemId, userId);
+	if (count.count == 0) {
+		db.prepare(
+			'INSERT INTO game_item_votes (game_item_id, user_id, game_item_vote) VALUES (?, ?, ?)'
+		).run(gameItemId, userId, vote);
+	} else {
+		db.prepare(
+			'UPDATE game_item_votes SET game_item_vote = ? WHERE game_item_id = ? AND user_id = ?'
+		).run(vote, gameItemId, userId);
+	}
 }
 
 export function createUser(userName) {
