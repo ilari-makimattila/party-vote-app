@@ -4,15 +4,19 @@ import { getGame, getUser } from '$lib/server/db';
 const voteOptions = [
 	{
 		label: 'Hate It!',
-		value: 0
+		value: -2
 	},
 	{
 		label: 'meh...',
-		value: 2
+		value: -1
+	},
+	{
+		label: "It's OK!",
+		value: 1
 	},
 	{
 		label: 'Love It!',
-		value: 5
+		value: 2
 	}
 ];
 
@@ -22,15 +26,12 @@ export async function getGameData(user, gameId, currentIdx) {
 	game.voteOptions = voteOptions;
 	let currentItem = null;
 	if (user) {
-		console.log('Current idx', currentIdx);
-		console.log(game.items);
 		currentIdx =
 			currentIdx !== null
 				? Number(currentIdx)
 				: game.items.findIndex(
 						(item) => !item.votes || !item.votes.find((vote) => vote.userId === user.id)
 				  );
-		console.log('Current idx', currentIdx);
 		currentItem = game.items[currentIdx];
 		if (currentItem) {
 			currentVote = currentItem.votes.find((vote) => vote.userId === user.id);
@@ -44,5 +45,7 @@ export async function GET(evt) {
 	const params = evt.params;
 	const currentIdx = evt.url.searchParams.get('item');
 	const user = getUser(evt.cookies.get('auth'));
-	return json(await getGameData(user, params.slug, currentIdx));
+	if (user) {
+		return json(await getGameData(user, params.slug, currentIdx));
+	}
 }

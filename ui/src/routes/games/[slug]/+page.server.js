@@ -21,7 +21,8 @@ export const actions = {
 		evt.cookies.set('auth', user.hash, {
 			path: '/',
 			sameSite: 'strict',
-			maxAge: 60 * 60 * 24 * 360 * 10
+			maxAge: 60 * 60 * 24 * 360 * 10,
+			secure: false
 		});
 		throw redirect(303, evt.url.pathname);
 	},
