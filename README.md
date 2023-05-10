@@ -2,6 +2,8 @@
 
 Create a game, add some items, ask people to vote!
 
+This is a quick hack written in a couple of afternoons. It was an opportunity to learn SvelteKit and try out Tailwindcss with some help from AI assistants.
+
 ## Developing
 
 ### Install dependencies
