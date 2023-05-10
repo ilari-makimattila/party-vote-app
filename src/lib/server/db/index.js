@@ -53,12 +53,19 @@ export function saveVote(gameItemId, userId, vote) {
 }
 
 export function createUser(userName) {
-	const userHash = createHash('sha256').update(randomBytes(1024)).update(userName).digest('hex');
-	const user = db
+	const userHash = createHash('sha256').update(userName).digest('hex');
+	let user = db
 		.prepare(
-			'INSERT INTO users (user_id, user_name, user_hash) VALUES ((SELECT COALESCE(MAX(user_id), 0) + 1 FROM users), ?, ?) RETURNING user_id AS id, user_name AS name, user_hash AS hash'
+			'SELECT user_id AS id, user_name AS name, user_hash AS hash FROM users WHERE user_hash = ?'
 		)
-		.get(userName, userHash);
+		.get(userHash);
+	if (!user) {
+		user = db
+			.prepare(
+				'INSERT INTO users (user_id, user_name, user_hash) VALUES ((SELECT COALESCE(MAX(user_id), 0) + 1 FROM users), ?, ?) RETURNING user_id AS id, user_name AS name, user_hash AS hash'
+			)
+			.get(userName, userHash);
+	}
 	return user;
 }
 

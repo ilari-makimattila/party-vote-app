@@ -2,7 +2,6 @@
 	import Statistics from './Statistics.svelte';
 	/** @type {import('./$types').PageData} */
 	export let data;
-	let currentVote;
 </script>
 
 <h1 class="text-xl text-center">{data.game.name}</h1>

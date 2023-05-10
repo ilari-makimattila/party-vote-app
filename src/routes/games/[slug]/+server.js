@@ -27,7 +27,7 @@ export async function getGameData(user, gameId, currentIdx) {
 			message: 'Game not found'
 		});
 	}
-	let currentVote = null;
+	let currentVote = {};
 	game.voteOptions = voteOptions;
 	let currentItem = null;
 	if (user) {
@@ -39,7 +39,7 @@ export async function getGameData(user, gameId, currentIdx) {
 				  );
 		currentItem = game.items[currentIdx];
 		if (currentItem) {
-			currentVote = currentItem.votes.find((vote) => vote.userId === user.id);
+			currentVote = currentItem.votes.find((vote) => vote.userId === user.id) || {};
 		}
 	}
 	return { game, user, currentItem, previous: Math.max(0, currentIdx - 1), currentVote };
