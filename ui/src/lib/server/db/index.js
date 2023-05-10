@@ -6,6 +6,9 @@ const db = new Database(env.DB_PATH, { verbose: console.log });
 
 export function getGame(gameId) {
 	const game = db.prepare('SELECT * FROM games WHERE game_id = ?').get(gameId);
+	if (!game) {
+		return null;
+	}
 	const items = db
 		.prepare(
 			'SELECT gi.*, giv.user_id, giv.game_item_vote FROM game_items gi LEFT JOIN game_item_votes giv ON gi.game_item_id = giv.game_item_id WHERE gi.game_id = ?'
@@ -45,6 +48,7 @@ export function saveVote(gameItemId, userId, vote) {
 		db.prepare(
 			'UPDATE game_item_votes SET game_item_vote = ? WHERE game_item_id = ? AND user_id = ?'
 		).run(vote, gameItemId, userId);
+		console.log('votge updated');
 	}
 }
 

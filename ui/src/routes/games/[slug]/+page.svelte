@@ -3,9 +3,6 @@
 	/** @type {import('./$types').PageData} */
 	export let data;
 	let currentVote;
-
-	$: currentVote =
-		currentVote != null ? currentVote : data.currentVote ? data.currentVote.vote : null;
 </script>
 
 <h1 class="text-xl text-center">{data.game.name}</h1>
@@ -36,7 +33,7 @@
 											name="vote"
 											id="v-{valueIdx}"
 											value={value.value}
-											bind:group={currentVote}
+											bind:group={data.currentVote.vote}
 										/>
 										<label
 											for="v-{valueIdx}"
@@ -62,16 +59,18 @@
 							name="item"
 							class="basis-1/2 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
 							value={data.currentItem.id}
-							disabled={currentVote === null}>Next</button
+							disabled={data.currentVote.vote === null}>Vote</button
 						>
 					</div>
 				</form>
 			</div>
 		</section>
 	{:else}
-        <a href="?item={data.game.items.length - 1}"
-            class="py-2.5 px-5 m-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
-        >Back to votes</a>
+		<a
+			href="?item={data.game.items.length - 1}"
+			class="py-2.5 px-5 m-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
+			>Back to votes</a
+		>
 	{/if}
 	<Statistics gameId={data.game.id} />
 {:else}

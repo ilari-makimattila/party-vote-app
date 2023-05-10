@@ -4,12 +4,11 @@
 	export let gameId;
 	let poller;
 	let items = [];
-	let voteCount = 0;
 	let mostLoved;
 	let mostLovedVotes = 0;
 	let mostHated;
 	let mostHatedVotes = 0;
-	let max = 0;
+	let votes = [];
 
 	const pollStats = async (gameId) => {
 		if (!gameId) {
@@ -18,13 +17,11 @@
 			const response = await fetch(`/games/${gameId}`);
 			const data = await response.json();
 
-			console.log(data.game);
 			items = [...data.game.items].sort(
 				(a, b) =>
 					b.votes.reduce((acc, i) => acc + i.vote, 0) - a.votes.reduce((acc, i) => acc + i.vote, 0)
 			);
-			max = items[0].votes.reduce((acc, i) => acc + i.vote, 0);
-			voteCount = items.reduce((a, i) => a + i.votes.length, 0);
+			votes = items.map((i) => i.votes.map((v) => ({ ...v, itemId: i.id }))).flat();
 			for (const item of items) {
 				const loves = item.votes.filter((v) => v.vote == 2).length;
 				const hates = item.votes.filter((v) => v.vote == -2).length;
@@ -66,32 +63,35 @@
 			{#if item.votes.length > 0}
 				<li>
 					<div class="flex flex-row">
-						<span class="basis-4/5">{item.name}</span>
-						<span class="basis-1/5 text-right"
-							>{(item.votes.reduce((acc, i) => acc + i.vote, 0) / item.votes.length).toFixed(
-								2
-							)}</span
+						<span class="basis-4/6">{item.name}</span>
+						<span class="basis-1/6 text-right">votes {item.votes.length}</span>
+						<span class="basis-1/6 text-right"
+							>score {item.votes.reduce((acc, i) => acc + i.vote, 0)}</span
 						>
 					</div>
 					<div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-						{#if item.votes.reduce((acc, i) => acc + i.vote, 0) / max > 0}
-							<div
-								class="bg-blue-600 h-2.5 rounded-full"
-								style="margin-left: 50%; width: {((item.votes.reduce((acc, i) => acc + i.vote, 0) /
-									max) *
-									100) /
-									2}%"
-							/>
-						{:else}
-							<div
-								class="bg-red-600 h-2.5 rounded-full rotate-180 origin-left"
-								style="margin-left: 50%; width: {50 +
-									((item.votes.reduce((acc, i) => acc + i.vote, 0) / max) * 100) / 2}%"
-							/>
-						{/if}
+						<div
+							class="bg-blue-600 h-2.5 rounded-full"
+							style="margin-left: 50%; width: {((item.votes
+								.filter((v) => v.vote > 0)
+								.reduce((acc, i) => acc + i.vote, 0) /
+								(item.votes.length * 2)) *
+								100) /
+								2}%"
+						/>
+						<div
+							class="bg-red-600 h-2.5 rounded-full rotate-180 origin-top-left"
+							style="margin-left: 50%; width: {((item.votes
+								.filter((v) => v.vote < 0)
+								.reduce((acc, i) => acc + Math.abs(i.vote), 0) /
+								(item.votes.length * 2)) *
+								100) /
+								2}%"
+						/>
 					</div>
 				</li>
 			{/if}
 		{/each}
 	</ul>
+	<!--code class="whitespace-pre font-mono">{(votes.map((v) => JSON.stringify(v)).join('\n'))}</code-->
 </section>

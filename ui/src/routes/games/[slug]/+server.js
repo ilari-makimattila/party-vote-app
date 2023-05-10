@@ -1,4 +1,4 @@
-import { json } from '@sveltejs/kit';
+import { json, error } from '@sveltejs/kit';
 import { getGame, getUser } from '$lib/server/db';
 
 const voteOptions = [
@@ -22,6 +22,11 @@ const voteOptions = [
 
 export async function getGameData(user, gameId, currentIdx) {
 	const game = getGame(gameId);
+	if (!game) {
+		throw error(404, {
+			message: 'Game not found'
+		});
+	}
 	let currentVote = null;
 	game.voteOptions = voteOptions;
 	let currentItem = null;
