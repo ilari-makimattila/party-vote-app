@@ -1,8 +1,8 @@
 import { createHash, randomBytes } from 'node:crypto';
 import Database from 'better-sqlite3';
-import { DB_PATH } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 
-const db = new Database(DB_PATH, { verbose: console.log });
+const db = new Database(env.DB_PATH, { verbose: console.log });
 
 export function getGame(gameId) {
 	const game = db.prepare('SELECT * FROM games WHERE game_id = ?').get(gameId);
