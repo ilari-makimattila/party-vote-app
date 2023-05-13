@@ -17,6 +17,10 @@ export function getGame(gameId) {
 	return {
 		id: gameId,
 		name: game.game_name,
+		css: {
+			style: game.game_style,
+			classes: game.game_class
+		},
 		items: Object.values(
 			items.reduce((acc, item) => {
 				if (!acc[item.game_item_id]) {
@@ -24,6 +28,7 @@ export function getGame(gameId) {
 						id: item.game_item_id,
 						name: item.game_item_name,
 						description: item.game_item_description,
+						picture: item.game_item_picture,
 						votes: []
 					};
 				}

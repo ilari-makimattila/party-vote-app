@@ -7,11 +7,13 @@ This is a quick hack written in a couple of afternoons. It was an opportunity to
 ## Developing
 
 ### Install dependencies
+
 ```bash
 npm install
 ```
 
 ### Run app in dev mode
+
 ```bash
 npm run dev
 ```
