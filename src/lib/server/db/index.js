@@ -11,7 +11,7 @@ export function getGame(gameId) {
 	}
 	const items = db
 		.prepare(
-			'SELECT gi.*, giv.user_id, giv.game_item_vote FROM game_items gi LEFT JOIN game_item_votes giv ON gi.game_item_id = giv.game_item_id WHERE gi.game_id = ?'
+			'SELECT gi.*, giv.user_id, giv.game_item_vote FROM game_items gi LEFT JOIN game_item_votes giv ON gi.game_item_id = giv.game_item_id WHERE gi.game_id = ? ORDER BY gi.game_item_id'
 		)
 		.all(gameId);
 	return {
